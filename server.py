@@ -19,12 +19,15 @@ class CalculateHandler(tornado.web.RequestHandler):
         shiftStartDate = str(self.get_argument("shiftStartDate"))
         shiftStartTime = str(self.get_argument("shiftStartTime"))
         startDateTime = shiftStartDate + shiftStartTime
-        startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d%H:%M')
 
         shiftEndDate = str(self.get_argument("shiftEndDate"))
         shiftEndTime = str(self.get_argument("shiftEndTime"))
         endDateTime = shiftEndDate + shiftEndTime
-        endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d%H:%M')
+        try:
+            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d%H:%M')
+            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d%H:%M')
+        except:
+            self.redirect("/calculate")
 
         timeDelta = endDateTime - startDateTime
         tdDecimalHours = (timeDelta.seconds / 3600)
@@ -36,7 +39,7 @@ class CalculateHandler(tornado.web.RequestHandler):
 
 class SignUpHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("signup.html")
+        self.render("signup.html", alerts = [])
 
     def post(self):
         info = []

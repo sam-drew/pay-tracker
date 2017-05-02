@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <title>TRANSMIT</title>
+    <link rel="stylesheet" href="{{ static_url("style.css")}}">
+    <link rel="manifest" href="{{ static_url("manifest.json") }}">
+</head>
+<body>
+    <div class="container">
+        <form class="form-login" action="/login" method="post">
+            <h1 class="heading">SIGN IN</h1>
+            <input class="form-control" type="email" name="email" autocomplete="off" placeholder="email" required>
+            <input class="form-control" type="password" name="password" placeholder="password" required>
+            <input class="form-control" type="submit" value="sign in">
+            {{ message }}
+            {% module xsrf_form_html() %}
+            <p>Alternatively, <a href="/signup">sign up</a></p>
+        </form>
+    </div>
+</body>
+</html>
