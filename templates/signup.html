@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{{ static_url("style.css") }}">
+</head>
+<body>
+    <div id="signupForm">
+        <form class="form-newuser" action="/signup" method="post">
+            <h1 class="heading">SIGN UP</h1>
+            <input class="form-control" name="email1" type="email" autocomplete="off" placeholder="email" required>
+            <input class="form-control" name="email2" type="email" autocomplete="off" placeholder="email verification" required>
+            <input class="form-control" name="userPass1" type="password" autocomplete="off" placeholder="password" required>
+            <input class="form-control" name="userPass2" type="password" autocomplete="off" placeholder="password verification" required>
+            <input class="form-control" type="submit" value="sign up">
+        </form>
+    </div>
+</body>

@@ -25,11 +25,17 @@ class RootHandler(tornado.web.RequestHandler):
         tdDecimalHours = (timeDelta.seconds / 3600)
         breakLength = float(self.get_argument("breakLength"))
         paidHours = tdDecimalHours - breakLength
+        self.redirect("/")
+
+class SignUpHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("signup.html")
 
 enable_pretty_logging()
 app = tornado.web.Application(
-    [(r"/", RootHandler),],
+    [(r"/", RootHandler),(r"/signup", SignUpHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
+    static_path = os.path.join(os.path.dirname(__file__), "static"),
     )
 
 http_server = tornado.httpserver.HTTPServer(app)

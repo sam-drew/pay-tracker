@@ -1,0 +1,30 @@
+html {
+    font-family: "Helvetica"
+}
+
+.form-newuser {
+  max-width: 330px;
+  margin: 0 auto;
+}
+
+.form-newuser .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-newuser input[type="password"], input[type="email"], input[type="text"] {
+  margin-bottom: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  width: 100%;
+}
+
+.form-newuser input[type="submit"] {
+    margin-top: 10px;
+    display: block;
+}
