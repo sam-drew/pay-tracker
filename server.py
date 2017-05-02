@@ -9,7 +9,7 @@ import bcrypt
 
 class RootHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("index.html")
+        self.render("singleShift.html")
 
     def post(self):
         shiftStartDate = str(self.get_argument("shiftStartDate"))
