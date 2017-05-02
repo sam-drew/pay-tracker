@@ -9,6 +9,10 @@ import bcrypt
 
 class RootHandler(tornado.web.RequestHandler):
     def get(self):
+        self.render("index.html")
+
+class CalculateHandler(tornado.web.RequestHandler):
+    def get(self):
         self.render("singleShift.html")
 
     def post(self):
@@ -26,7 +30,9 @@ class RootHandler(tornado.web.RequestHandler):
         tdDecimalHours = (timeDelta.seconds / 3600)
         breakLength = float(self.get_argument("breakLength"))
         paidHours = tdDecimalHours - breakLength
-        self.redirect("/")
+        wage = float(self.get_argument("hourlyWage"))
+        totalPay = (paidHours * wage)
+        self.render("singleShiftResult.html", result = totalPay)
 
 class SignUpHandler(tornado.web.RequestHandler):
     def get(self):
@@ -78,7 +84,7 @@ def hashPwd(pwd, salt):
 
 enable_pretty_logging()
 app = tornado.web.Application(
-    [(r"/", RootHandler),(r"/signup", SignUpHandler),],
+    [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     )

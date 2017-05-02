@@ -2,6 +2,10 @@ html {
     font-family: "Helvetica"
 }
 
+a {
+    text-decoration: none;
+}
+
 .form-newuser {
   max-width: 330px;
   margin: 0 auto;
