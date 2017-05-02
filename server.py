@@ -5,6 +5,7 @@ from tornado.log import enable_pretty_logging
 import logging
 import os.path
 from datetime import datetime
+import bcrypt
 
 class RootHandler(tornado.web.RequestHandler):
     def get(self):
@@ -30,6 +31,50 @@ class RootHandler(tornado.web.RequestHandler):
 class SignUpHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("signup.html")
+
+    def post(self):
+        info = []
+        for argument in ["email1", "email2", "userPass1", "userPass2"]:
+            info.append(self.get_argument(argument))
+        logging.info("Attempt to add new user: {0}".format(info))
+        alerts = []
+        if self.get_argument("email1") != self.get_argument("email2"):
+            alerts.append("Emails do not match")
+            if self.get_argument("userPass1") != self.get_argument("userPass2"):
+                alerts.append("Passwords do not match")
+                logging.info("Failed to add new user; neither match")
+                self.render("signup.html", alerts = alerts)
+            else:
+                self.render("signup.html", alerts = alerts)
+                logging.info("Failed to add new user; emails don't match")
+        elif self.get_argument("userPass1") != self.get_argument("userPass2"):
+            alerts.append("Passwords do not match")
+            logging.info("Failed to add new user; pwds don't match")
+            self.render("signup.html", alerts = alerts)
+        else:
+            newEmail = self.get_argument("email1")
+            salt = (bcrypt.gensalt()).decode("utf-8")
+            password = (hashPwd(self.get_argument("userPass1"), salt)).decode("utf-8")
+            uid = stringUUID()
+            #returnValue = dbhandler.setUserInfo(newEmail, password, salt, uid)
+            #if returnValue == True:
+            #    self.set_secure_cookie("email", self.get_argument("email1"))
+            #    logging.info("Added new user successfully")
+            #else:
+            #    logging.error("Failed to add a new user")
+            #    logging.error(returnValue)
+            #    self.render("signup.html", alerts = ["failed to sign you up",])
+
+def stringUUID():
+    uid = uuid.uuid4()
+    uid = uid.urn[9:]
+    return(uid)
+
+def hashPwd(pwd, salt):
+    pwd = bytes(pwd, "ascii")
+    salt = bytes(salt, "ascii")
+    hashed = bcrypt.hashpw(pwd, salt)
+    return(hashed)
 
 enable_pretty_logging()
 app = tornado.web.Application(
