@@ -43,8 +43,8 @@ def checkEmail(email):
     try:
         with connection.cursor() as cursor:
             sql = ("SELECT email FROM users WHERE email = '{0}'")
-            returnVal = cursor.execute(sql.format(email)))
-            if returnVal == 1:
+            returnVal = cursor.execute(sql.format(email))
+            if returnVal == 0:
                 return(True)
             else:
                 return(returnVal)
@@ -60,11 +60,10 @@ def getLoginEmail(email):
         with connection.cursor() as cursor:
             sql = ("SELECT password, salt FROM users WHERE email = '{0}'")
             returnValue = cursor.execute(sql.format(email))
-            if returnValue == True:
-                results = cursor.fetchone()
-                return(results)
-            else:
+            if returnValue == 0:
                 return(False)
+            else:
+                return(cursor.fetchone())
     except Exception as e:
         return("Error: {0}. Error code is {1}".format(e, e.args[0]))
     finally:
