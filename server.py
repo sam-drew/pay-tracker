@@ -7,10 +7,13 @@ import os.path
 from datetime import datetime
 import bcrypt
 
+# Class to define how to handle requests to the root of the website.
 class RootHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("index.html")
 
+# Class to define how to handle GET requests to "/calculate", and how to handle
+# POST requests to made from the single shift calculator.
 class CalculateHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("singleShift.html")
@@ -37,6 +40,8 @@ class CalculateHandler(tornado.web.RequestHandler):
         totalPay = (paidHours * wage)
         self.render("singleShiftResult.html", result = totalPay)
 
+# Class to define how to handle requests made to the sign up page. Validate info
+# is verified, and submit to database.
 class SignUpHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("signup.html", alerts = [])
@@ -77,6 +82,24 @@ class SignUpHandler(tornado.web.RequestHandler):
 class LoginHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("login.html", message = "")
+
+    def post(self):
+        # Get the password info from the database
+        info = dbhandler.getLoginEmail(self.get_argument("email"))
+        if info != False:
+            pwd = info['password']
+            salt = info['salt']
+            pwd = bytes(pwd, "ascii")
+            userpass = self.get_argument("password")
+            hasheduserpass = hashPwd(userpass, salt)
+            if hasheduserpass == pwd:
+                self.set_secure_cookie("email", self.get_argument("email"))
+                self.redirect("/home")
+            else:
+                self.render("login.html", message = "The information you supplied did not match an existing account")
+        else:
+            self.render("login.html", message = "The information you supplied did not match an existing account")
+
 
 def stringUUID():
     uid = uuid.uuid4()
