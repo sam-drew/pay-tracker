@@ -18,14 +18,14 @@ class CalculateHandler(tornado.web.RequestHandler):
     def post(self):
         shiftStartDate = str(self.get_argument("shiftStartDate"))
         shiftStartTime = str(self.get_argument("shiftStartTime"))
-        startDateTime = shiftStartDate + shiftStartTime
+        startDateTime = shiftStartDate + " " + shiftStartTime
 
         shiftEndDate = str(self.get_argument("shiftEndDate"))
         shiftEndTime = str(self.get_argument("shiftEndTime"))
-        endDateTime = shiftEndDate + shiftEndTime
+        endDateTime = shiftEndDate + " " + shiftEndTime
         try:
-            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d%H:%M')
-            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d%H:%M')
+            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
+            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
         except:
             self.redirect("/calculate")
 
