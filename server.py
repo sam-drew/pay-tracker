@@ -70,17 +70,21 @@ class SignUpHandler(tornado.web.RequestHandler):
             self.render("signup.html", alerts = alerts)
         else:
             newEmail = self.get_argument("email1")
-            salt = (bcrypt.gensalt()).decode("utf-8")
-            password = (hashPwd(self.get_argument("userPass1"), salt)).decode("utf-8")
-            returnValue = dbhandler.setUserInfo(newEmail, password, salt)
-            if returnValue == True:
-                self.set_secure_cookie("email", self.get_argument("email1"))
-                logging.info("Added new user successfully")
-                self.redirect("/home")
+            if dbhandler.checkEmail(newEmail) == True:
+                salt = (bcrypt.gensalt()).decode("utf-8")
+                password = (hashPwd(self.get_argument("userPass1"), salt)).decode("utf-8")
+                returnValue = dbhandler.setUserInfo(newEmail, password, salt)
+                if returnValue == True:
+                    self.set_secure_cookie("email", self.get_argument("email1"))
+                    logging.info("Added new user successfully")
+                    self.redirect("/home")
+                else:
+                    logging.error("Failed to add a new user")
+                    logging.error(returnValue)
+                    self.render("signup.html", alerts = ["Sign Up failed.",])
             else:
-                logging.error("Failed to add a new user")
-                logging.error(returnValue)
-                self.render("signup.html", alerts = ["Sign Up failed.",])
+                alerts.append("Email address already in use")
+                self.render("signup.html", alerts = alerts)
 
 # Class to define how the login page and requests should be handled. Including
 # matching input data to that of the database.
@@ -121,6 +125,7 @@ app = tornado.web.Application(
     (r"/login", LoginHandler), (r"/home", HomeHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
+    cookie_secret = "secret",
     )
 
 http_server = tornado.httpserver.HTTPServer(app)

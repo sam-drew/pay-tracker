@@ -43,7 +43,11 @@ def checkEmail(email):
     try:
         with connection.cursor() as cursor:
             sql = ("SELECT email FROM users WHERE email = '{0}'")
-            return(cursor.execute(sql.format(email)))
+            returnVal = cursor.execute(sql.format(email)))
+            if returnVal == 1:
+                return(True)
+            else:
+                return(returnVal)
     except Exception as e:
         return("Error: {0}. Error code is {1}".format(e, e.args[0]))
     finally:
