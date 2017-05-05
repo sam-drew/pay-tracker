@@ -72,15 +72,15 @@ class SignUpHandler(tornado.web.RequestHandler):
             newEmail = self.get_argument("email1")
             salt = (bcrypt.gensalt()).decode("utf-8")
             password = (hashPwd(self.get_argument("userPass1"), salt)).decode("utf-8")
-            uid = stringUUID()
-            #returnValue = dbhandler.setUserInfo(newEmail, password, salt, uid)
-            #if returnValue == True:
-            #    self.set_secure_cookie("email", self.get_argument("email1"))
-            #    logging.info("Added new user successfully")
-            #else:
-            #    logging.error("Failed to add a new user")
-            #    logging.error(returnValue)
-            #    self.render("signup.html", alerts = ["failed to sign you up",])
+            returnValue = dbhandler.setUserInfo(newEmail, password, salt)
+            if returnValue == True:
+                self.set_secure_cookie("email", self.get_argument("email1"))
+                logging.info("Added new user successfully")
+                self.redirect("/home")
+            else:
+                logging.error("Failed to add a new user")
+                logging.error(returnValue)
+                self.render("signup.html", alerts = ["Sign Up failed.",])
 
 # Class to define how the login page and requests should be handled. Including
 # matching input data to that of the database.
@@ -105,6 +105,10 @@ class LoginHandler(tornado.web.RequestHandler):
         else:
             self.render("login.html", message = "The information you supplied did not match an existing account")
 
+class HomeHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("home.html")
+
 def hashPwd(pwd, salt):
     pwd = bytes(pwd, "ascii")
     salt = bytes(salt, "ascii")
@@ -114,7 +118,7 @@ def hashPwd(pwd, salt):
 enable_pretty_logging()
 app = tornado.web.Application(
     [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
-    (r"/login", LoginHandler),],
+    (r"/login", LoginHandler), (r"/home", HomeHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     )
