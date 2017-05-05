@@ -83,14 +83,17 @@ class SignUpHandler(tornado.web.RequestHandler):
                     logging.error(returnValue)
                     self.render("signup.html", alerts = ["Sign Up failed.",])
             else:
-                alerts.append("Email address already in use")
+                alerts.append("Email address already in use, please try again.")
                 self.render("signup.html", alerts = alerts)
 
 # Class to define how the login page and requests should be handled. Including
 # matching input data to that of the database.
 class LoginHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("login.html", message = "")
+        if not self.get_secure_cookie("email"):
+            self.render("login.html", message = "")
+        else:
+            self.redirect("/home")
 
     def post(self):
         # Get the password info from the database
@@ -105,14 +108,19 @@ class LoginHandler(tornado.web.RequestHandler):
                 self.set_secure_cookie("email", self.get_argument("email"))
                 self.redirect("/home")
             else:
-                self.render("login.html", message = "The information you supplied did not match an existing account")
+                self.render("login.html", message = "The information you supplied did not match an existing account (DEBUG WRONG PWD)")
         else:
             self.render("login.html", message = "The information you supplied did not match an existing account")
 
+# Class to define how requests to the "/home" URL are handled.
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("home.html")
+        if not self.get_secure_cookie("email"):
+            self.redirect("/signup")
+        else:
+            self.render("home.html")
 
+# Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
     pwd = bytes(pwd, "ascii")
     salt = bytes(salt, "ascii")
