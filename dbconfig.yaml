@@ -1,0 +1,5 @@
+MySQL:
+    hostname: 'localhost'
+    user: 'root'
+    password: 'password'
+    database: 'payTracker'
