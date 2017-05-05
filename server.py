@@ -74,6 +74,10 @@ class SignUpHandler(tornado.web.RequestHandler):
             #    logging.error(returnValue)
             #    self.render("signup.html", alerts = ["failed to sign you up",])
 
+class LoginHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("login.html", message = "")
+
 def stringUUID():
     uid = uuid.uuid4()
     uid = uid.urn[9:]
@@ -87,7 +91,8 @@ def hashPwd(pwd, salt):
 
 enable_pretty_logging()
 app = tornado.web.Application(
-    [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),],
+    [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
+    (r"/login", LoginHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     )

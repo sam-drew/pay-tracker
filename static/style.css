@@ -34,6 +34,59 @@ a {
 }
 
 #homePage {
-    max-width: 550px;
+    max-width: 473px;
     margin: 0 auto;
+}
+
+.form-login {
+  max-width: 330px;
+  margin: 0 auto;
+}
+
+.form-login .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+
+
+.form-login input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 100%;
+}
+
+.form-login input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  width: 100%;
+}
+
+.form-login input[type="submit"] {
+    display: block;
+}
+
+.loginsignup {
+    display: inline-block;
+}
+
+#signup {
+    float: right;
+}
+
+#resultPage {
+    max-width: 473px;
+    margin: 0 auto;
+}
+
+#singleShiftForm {
+    max-width: 330px;
+    margin: 0 auto;
+    padding-top: 30px;
 }
