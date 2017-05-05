@@ -108,7 +108,7 @@ class LoginHandler(tornado.web.RequestHandler):
                 self.set_secure_cookie("email", self.get_argument("email"))
                 self.redirect("/home")
             else:
-                self.render("login.html", message = "The information you supplied did not match an existing account (DEBUG WRONG PWD)")
+                self.render("login.html", message = "The information you supplied did not match an existing account")
         else:
             self.render("login.html", message = "The information you supplied did not match an existing account")
 
@@ -120,6 +120,29 @@ class HomeHandler(tornado.web.RequestHandler):
         else:
             self.render("home.html")
 
+class NewShiftHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("newShifts.html")
+
+    def post(self):
+        shiftStartDate = str(self.get_argument("shiftStartDate"))
+        shiftStartTime = str(self.get_argument("shiftStartTime"))
+        startDateTime = shiftStartDate + " " + shiftStartTime
+        shiftEndDate = str(self.get_argument("shiftEndDate"))
+        shiftEndTime = str(self.get_argument("shiftEndTime"))
+        endDateTime = shiftEndDate + " " + shiftEndTime
+        try:
+            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
+            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
+        except:
+            self.redirect("/newShift")
+        timeDelta = endDateTime - startDateTime
+        tdDecimalHours = (timeDelta.seconds / 3600)
+        breakLength = float(self.get_argument("breakLength"))
+        paidHours = tdDecimalHours - breakLength
+        wage = float(self.get_argument("hourlyWage"))
+        totalPay = (paidHours * wage)
+
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
     pwd = bytes(pwd, "ascii")
@@ -130,7 +153,8 @@ def hashPwd(pwd, salt):
 enable_pretty_logging()
 app = tornado.web.Application(
     [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
-    (r"/login", LoginHandler), (r"/home", HomeHandler),],
+    (r"/login", LoginHandler), (r"/home", HomeHandler), (r"/newShift", NewShiftHandler),
+    ],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     cookie_secret = "secret",

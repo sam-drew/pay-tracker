@@ -68,3 +68,17 @@ def getLoginEmail(email):
         return("Error: {0}. Error code is {1}".format(e, e.args[0]))
     finally:
         connection.close()
+
+# Function to add a new shift to the database.
+def addNewShift(startDateTime, endDateTime, breakLength, pay, userID):
+    connection = makeConnection()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("INSERT INTO shifts (startTime, endTime, break_length, pay, userID) VALUES ('{0}', '{1}', {2}, {3}, '{4}')")
+            cursor.execute(sql.format(startDateTime, endDateTime, breakLength, pay, userID))
+        connection.commit()
+        return(True)
+    except Exception as e:
+        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+    finally:
+        connection.close()
