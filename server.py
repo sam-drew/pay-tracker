@@ -2,10 +2,13 @@ import tornado.web
 import tornado.httpserver
 import tornado.ioloop
 from tornado.log import enable_pretty_logging
+
 import logging
 import os.path
 from datetime import datetime
 import bcrypt
+
+import dbhandler
 
 # Class to define how to handle requests to the root of the website.
 class RootHandler(tornado.web.RequestHandler):
@@ -79,6 +82,8 @@ class SignUpHandler(tornado.web.RequestHandler):
             #    logging.error(returnValue)
             #    self.render("signup.html", alerts = ["failed to sign you up",])
 
+# Class to define how the login page and requests should be handled. Including
+# matching input data to that of the database.
 class LoginHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("login.html", message = "")
@@ -99,12 +104,6 @@ class LoginHandler(tornado.web.RequestHandler):
                 self.render("login.html", message = "The information you supplied did not match an existing account")
         else:
             self.render("login.html", message = "The information you supplied did not match an existing account")
-
-
-def stringUUID():
-    uid = uuid.uuid4()
-    uid = uid.urn[9:]
-    return(uid)
 
 def hashPwd(pwd, salt):
     pwd = bytes(pwd, "ascii")
