@@ -112,6 +112,15 @@ class LoginHandler(tornado.web.RequestHandler):
         else:
             self.render("login.html", message = "The information you supplied did not match an existing account")
 
+# Class to define how a user should be logged out of the service.
+class LogoutHandler(tornado.web.RequestHandler):
+    def get(self):
+        if self.get_secure_cookie("email"):
+            self.clear_cookie("email")
+            self.redirect("/")
+        else:
+            self.redirect("/")
+
 # Class to define how requests to the "/home" URL are handled.
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
@@ -122,7 +131,10 @@ class HomeHandler(tornado.web.RequestHandler):
 
 class NewShiftHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("newShifts.html")
+        if not self.get_secure_cookie("email"):
+            self.redirect("/login")
+        else:
+            self.render("newShifts.html")
 
     def post(self):
         shiftStartDate = str(self.get_argument("shiftStartDate"))
@@ -142,6 +154,7 @@ class NewShiftHandler(tornado.web.RequestHandler):
         paidHours = tdDecimalHours - breakLength
         wage = float(self.get_argument("hourlyWage"))
         totalPay = (paidHours * wage)
+        email = self.get_argument("email")
 
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
@@ -154,7 +167,7 @@ enable_pretty_logging()
 app = tornado.web.Application(
     [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
     (r"/login", LoginHandler), (r"/home", HomeHandler), (r"/newShift", NewShiftHandler),
-    ],
+    (r"/logout", LogoutHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     cookie_secret = "secret",
