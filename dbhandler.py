@@ -47,7 +47,7 @@ def checkEmail(email):
             if returnVal == 0:
                 return(True)
             else:
-                return(returnVal)
+                return(False)
     except Exception as e:
         return("Error: {0}. Error code is {1}".format(e, e.args[0]))
     finally:
@@ -78,6 +78,32 @@ def addNewShift(startDateTime, endDateTime, breakLength, pay, userID):
             cursor.execute(sql.format(startDateTime, endDateTime, breakLength, pay, userID))
         connection.commit()
         return(True)
+    except Exception as e:
+        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+    finally:
+        connection.close()
+
+def getShifts(userID):
+    connection = makeConnection()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT startTime, endTime FROM shifts WHERE userID = '{0}'")
+            cursor.execute(sql.format(userID))
+            shifts = cursor.fetchall()
+            return(shifts)
+    except Exception as e:
+        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+    finally:
+        connection.close()
+
+def getUserID(email):
+    connection = makeConnection()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT ID FROM users WHERE email = '{0}'")
+            cursor.execute(sql.format(email))
+            ID = cursor.fetchone()
+            return(ID)
     except Exception as e:
         return("Error: {0}. Error code is {1}".format(e, e.args[0]))
     finally:
