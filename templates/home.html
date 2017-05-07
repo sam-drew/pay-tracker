@@ -11,6 +11,11 @@
     <div id="homePage">
         <h1>Shift Tracker</h1>
         <p><a href="/newShift">Add a new shift.</a></p>
+        <p>
+            {% for shift in shifts %}
+            {{ shift }}
+            {% end %}
+        </p>
         <p><a href="/logout">Logout</a></p>
     </div>
 </body>

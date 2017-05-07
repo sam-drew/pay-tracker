@@ -90,3 +90,15 @@ a {
     margin: 0 auto;
     padding-top: 30px;
 }
+
+#homePage {
+    max-width: 473px;
+    margin: 0 auto;
+    padding-top: 30px;
+}
+
+#newShiftPage {
+    max-width: 473px;
+    margin: 0 auto;
+    padding-top: 30px;
+}
