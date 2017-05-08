@@ -55,27 +55,27 @@ class SignUpHandler(tornado.web.RequestHandler):
             info.append(self.get_argument(argument))
         logging.info("Attempt to add new user: {0}".format(info))
         alerts = []
-        if self.get_argument("email1") != self.get_argument("email2"):
+        if info[0] != info[2]:
             alerts.append("Emails do not match")
-            if self.get_argument("userPass1") != self.get_argument("userPass2"):
+            if info[2] != info[3]:
                 alerts.append("Passwords do not match")
                 logging.info("Failed to add new user; neither match")
                 self.render("signup.html", alerts = alerts)
             else:
                 self.render("signup.html", alerts = alerts)
                 logging.info("Failed to add new user; emails don't match")
-        elif self.get_argument("userPass1") != self.get_argument("userPass2"):
+        elif info[2] != info[3]:
             alerts.append("Passwords do not match")
             logging.info("Failed to add new user; pwds don't match")
             self.render("signup.html", alerts = alerts)
         else:
-            newEmail = self.get_argument("email1")
+            newEmail = info[0]
             if dbhandler.checkEmail(newEmail) == True:
                 salt = (bcrypt.gensalt()).decode("utf-8")
-                password = (hashPwd(self.get_argument("userPass1"), salt)).decode("utf-8")
+                password = (hashPwd(info[2], salt)).decode("utf-8")
                 returnValue = dbhandler.setUserInfo(newEmail, password, salt)
                 if returnValue == True:
-                    self.set_secure_cookie("email", self.get_argument("email1"))
+                    self.set_secure_cookie("email", info[0])
                     logging.info("Added new user successfully")
                     self.redirect("/home")
                 else:
@@ -127,8 +127,11 @@ class HomeHandler(tornado.web.RequestHandler):
         if not self.get_secure_cookie("email"):
             self.redirect("/signup")
         else:
-            self.render("home.html")
+            shifts = []
+            self.render("home.html", shifts = shifts)
 
+# Class to define how requests to the "/newShift" URL are handled. Includes
+# addind a new shift to the database, does not calculate pay.
 class NewShiftHandler(tornado.web.RequestHandler):
     def get(self):
         if not self.get_secure_cookie("email"):
@@ -137,6 +140,7 @@ class NewShiftHandler(tornado.web.RequestHandler):
             self.render("newShifts.html")
 
     def post(self):
+        email = self.get_secure_cookie("email").decode("utf-8")
         shiftStartDate = str(self.get_argument("shiftStartDate"))
         shiftStartTime = str(self.get_argument("shiftStartTime"))
         startDateTime = shiftStartDate + " " + shiftStartTime
@@ -148,13 +152,15 @@ class NewShiftHandler(tornado.web.RequestHandler):
             endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
         except:
             self.redirect("/newShift")
-        timeDelta = endDateTime - startDateTime
-        tdDecimalHours = (timeDelta.seconds / 3600)
         breakLength = float(self.get_argument("breakLength"))
-        paidHours = tdDecimalHours - breakLength
         wage = float(self.get_argument("hourlyWage"))
-        totalPay = (paidHours * wage)
-        email = self.get_argument("email")
+        userID = dbhandler.getUserID(email)['ID']
+        returnValue = dbhandler.addNewShift(startDateTime, endDateTime, breakLength, wage, userID)
+        if returnValue != True:
+            logging.error(returnValue)
+            self.render("newShifts.html")
+        else:
+            self.redirect("/home")
 
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):

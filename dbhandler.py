@@ -32,7 +32,7 @@ def setUserInfo(email, password, salt):
         return(True)
     # Handle any errors on MySQL's part
     except Exception as e:
-        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
 
@@ -49,7 +49,7 @@ def checkEmail(email):
             else:
                 return(False)
     except Exception as e:
-        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
 
@@ -65,7 +65,7 @@ def getLoginEmail(email):
             else:
                 return(cursor.fetchone())
     except Exception as e:
-        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
 
@@ -79,7 +79,7 @@ def addNewShift(startDateTime, endDateTime, breakLength, pay, userID):
         connection.commit()
         return(True)
     except Exception as e:
-        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
 
@@ -92,7 +92,7 @@ def getShifts(userID):
             shifts = cursor.fetchall()
             return(shifts)
     except Exception as e:
-        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
 
@@ -105,6 +105,6 @@ def getUserID(email):
             ID = cursor.fetchone()
             return(ID)
     except Exception as e:
-        return("Error: {0}. Error code is {1}".format(e, e.args[0]))
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
