@@ -127,8 +127,19 @@ class HomeHandler(tornado.web.RequestHandler):
         if not self.get_secure_cookie("email"):
             self.redirect("/signup")
         else:
-            shifts = []
-            self.render("home.html", shifts = shifts)
+            email = self.get_secure_cookie("email").decode("utf-8")
+            userID = dbhandler.getUserID(email)['ID']
+            shifts = dbhandler.getShifts(userID)
+            formatedShifts = []
+            for shift in shifts:
+                formatedShifts.append(
+                {
+                "startDate" : shift['startTime'].strftime("%m/%d/%Y"),
+                "startTime" : shift['startTime'].strftime("%H:%M"),
+                "endTime" : shift['endTime'].strftime("%H:%M")
+                }
+                )
+            self.render("home.html", shifts = formatedShifts)
 
 # Class to define how requests to the "/newShift" URL are handled. Includes
 # addind a new shift to the database, does not calculate pay.
@@ -177,6 +188,7 @@ app = tornado.web.Application(
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     cookie_secret = "secret",
+    debug = True,
     )
 
 http_server = tornado.httpserver.HTTPServer(app)
