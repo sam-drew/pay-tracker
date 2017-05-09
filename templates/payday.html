@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <link rel="stylesheet" href="{{ static_url("style.css") }}">
+    <title>Payday</title>
+</head>
+<body>
+    <div id="paydayInfo">
+        <h3>Payday Information</h3>
+        <table>
+            <tr>
+                <td><i>Date</i></td>
+                <td>{{ payInfo['date'] }}</td>
+            </tr>
+            <tr>
+                <td><i>Estimated Gross Pay</i></td>
+                <td>{{ payInfo['pay'] }}</td>
+            </tr>
+        </table>
+    </div>
+    <div id="payDayShifts">
+        <h3>Shifts</h3>
+        <table>
+            <tr>
+                <td><b>Start Date</b></td>
+                <td><b>Start Time</b></td>
+                <td><b>End Time</b></td>
+            </tr>
+            {% for shift in shifts %}
+            <tr>
+                <td><a href="/editShift/{{ shift['ID'] }}">{{ shift['startDate'] }}</a></td>
+                <td><a href="/editShift/{{ shift['ID'] }}">{{ shift['startTime'] }}</a></td>
+                <td><a href="/editShift/{{ shift['ID'] }}">{{ shift['endTime'] }}</a></td>
+            </tr>
+            {% end %}
+        </div>
+    </div>
+</body>
+</html>

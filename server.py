@@ -15,6 +15,11 @@ class RootHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("index.html")
 
+# Class to define how the T&Cs page should be rendered.
+class TermsHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("terms.html")
+
 # Class to define how to handle GET requests to "/calculate", and how to handle
 # POST requests to made from the single shift calculator.
 class CalculateHandler(tornado.web.RequestHandler):
@@ -174,6 +179,8 @@ class NewShiftHandler(tornado.web.RequestHandler):
         else:
             self.redirect("/home")
 
+# Class to define how users should be able to edit shifts that they have already
+# saved to the database. Also gives more detailed info about shift.
 class EditShiftHandler(tornado.web.RequestHandler):
     def get(self, url):
         # Validate user exists.
@@ -243,9 +250,27 @@ class EditShiftHandler(tornado.web.RequestHandler):
         else:
             self.redirect("/editShift/{0}".format(shiftID))
 
-class TermsHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("terms.html")
+# Class to define how payday information should be displayed.
+class PayDayHandler(tornado.web.RequestHandler):
+    def get(self, url):
+        email = self.get_secure_cookie("email").decode("utf-8")
+        userID = dbhandler.getUserID(email)['ID']
+        shifts = dbhandler.getShifts(userID)
+        shiftInfo = []
+        payInfo = {
+        'date' : "TEST 04/04/2017",
+        'pay' : 500
+        }
+        for shift in shifts:
+            shiftInfo.append(
+            {
+            "startDate" : shift['startTime'].strftime("%m/%d/%Y"),
+            "startTime" : shift['startTime'].strftime("%H:%M"),
+            "endTime" : shift['endTime'].strftime("%H:%M"),
+            "ID" : shift['ID']
+            }
+            )
+        self.render("payday.html", shifts = shiftInfo, payInfo = payInfo)
 
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
@@ -266,7 +291,7 @@ app = tornado.web.Application(
     [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
     (r"/login", LoginHandler), (r"/home", HomeHandler), (r"/newShift", NewShiftHandler),
     (r"/logout", LogoutHandler), (r"/editShift/(.*)", EditShiftHandler),
-    (r"/terms", TermsHandler),],
+    (r"/terms", TermsHandler), (r"/payday/(.*)", PayDayHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     cookie_secret = "secret",
