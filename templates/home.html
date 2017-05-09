@@ -13,7 +13,7 @@
         <p><a href="/newShift">Add a new shift.</a></p>
         <p>
             {% for shift in shifts %}
-                <div>{{ shift['startDate'] }}    {{ shift['startTime'] }}    {{ shift['endTime'] }}</div>
+            <div><a href="/editShift/{{ shift['ID'] }}">{{ shift['startDate'] }}    {{ shift['startTime'] }}    {{ shift['endTime'] }}</a></div>
             {% end %}
         </p>
         <p><a href="/logout">Logout</a></p>

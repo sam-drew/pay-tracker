@@ -102,3 +102,7 @@ a {
     margin: 0 auto;
     padding-top: 30px;
 }
+
+td {
+    padding-right: 10px;
+}
