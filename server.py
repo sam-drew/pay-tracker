@@ -221,6 +221,7 @@ class EditShiftHandler(tornado.web.RequestHandler):
             shiftUserID = shiftUserID['userID']
         else:
             self.redirect("/home")
+        # Get change info from form.
         shiftStartDate = str(self.get_argument("shiftStartDate"))
         shiftStartTime = str(self.get_argument("shiftStartTime"))
         startDateTime = shiftStartDate + " " + shiftStartTime
@@ -234,6 +235,7 @@ class EditShiftHandler(tornado.web.RequestHandler):
             self.redirect("/newShift")
         breakLength = float(self.get_argument("breakLength"))
         wage = float(self.get_argument("hourlyWage"))
+        # Attempt to commit changes to database.
         returnValue = dbhandler.editShiftInfo(shiftID, startDateTime, endDateTime, breakLength, wage)
         if returnValue != True:
             logging.error(returnValue)
@@ -241,6 +243,9 @@ class EditShiftHandler(tornado.web.RequestHandler):
         else:
             self.redirect("/editShift/{0}".format(shiftID))
 
+class TermsHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("terms.html")
 
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
@@ -260,7 +265,8 @@ enable_pretty_logging()
 app = tornado.web.Application(
     [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
     (r"/login", LoginHandler), (r"/home", HomeHandler), (r"/newShift", NewShiftHandler),
-    (r"/logout", LogoutHandler), (r"/editShift/(.*)", EditShiftHandler),],
+    (r"/logout", LogoutHandler), (r"/editShift/(.*)", EditShiftHandler),
+    (r"/terms", TermsHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     cookie_secret = "secret",
