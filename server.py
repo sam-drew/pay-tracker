@@ -206,11 +206,41 @@ class EditShiftHandler(tornado.web.RequestHandler):
             self.redirect("/home")
 
     def post(self, url):
+        # Validate user exists.
         email = self.get_secure_cookie("email").decode("utf-8")
         userID = dbhandler.getUserID(email)
+        if userID != None:
+            userID = userID['ID']
+        else:
+            self.redirect("/home")
+        # Validate that the shift being edited belongs to that user.
         shiftID = url.rsplit("/", 1)
         shiftID = (shiftID[(len(shiftID) - 1)])
-        self.redirect("/editShift/{0}".format(shiftID))
+        shiftUserID = dbhandler.getShiftUserID(shiftID)
+        if shiftUserID != None:
+            shiftUserID = shiftUserID['userID']
+        else:
+            self.redirect("/home")
+        shiftStartDate = str(self.get_argument("shiftStartDate"))
+        shiftStartTime = str(self.get_argument("shiftStartTime"))
+        startDateTime = shiftStartDate + " " + shiftStartTime
+        shiftEndDate = str(self.get_argument("shiftEndDate"))
+        shiftEndTime = str(self.get_argument("shiftEndTime"))
+        endDateTime = shiftEndDate + " " + shiftEndTime
+        try:
+            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
+            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
+        except:
+            self.redirect("/newShift")
+        breakLength = float(self.get_argument("breakLength"))
+        wage = float(self.get_argument("hourlyWage"))
+        returnValue = dbhandler.editShiftInfo(shiftID, startDateTime, endDateTime, breakLength, wage)
+        if returnValue != True:
+            logging.error(returnValue)
+            self.redirect("/editShift/{0}".format(shiftID))
+        else:
+            self.redirect("/editShift/{0}".format(shiftID))
+
 
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
