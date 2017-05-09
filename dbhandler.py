@@ -133,3 +133,16 @@ def getShiftInfo(shiftID):
         return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
+
+def editShiftInfo(shiftID, startTime, endTime, breakLength, pay):
+    connection = makeConnection()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("UPDATE shifts SET startTime = {0}, endTime = {1}, break_length = {2}, pay = {3} WHERE ID = {4}")
+            cursor.execute(sql.format(startTime, endTime, breakLength, pay, shiftID))
+        connection.commit()
+        return(True)
+    except Exception as e:
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
+    finally:
+        connection.close()
