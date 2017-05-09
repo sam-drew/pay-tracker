@@ -138,7 +138,7 @@ def editShiftInfo(shiftID, startTime, endTime, breakLength, pay):
     connection = makeConnection()
     try:
         with connection.cursor() as cursor:
-            sql = ("UPDATE shifts SET startTime = {0}, endTime = {1}, break_length = {2}, pay = {3} WHERE ID = {4}")
+            sql = ("UPDATE shifts SET startTime = '{0}', endTime = '{1}', break_length = {2}, pay = {3} WHERE ID = '{4}'")
             cursor.execute(sql.format(startTime, endTime, breakLength, pay, shiftID))
         connection.commit()
         return(True)
