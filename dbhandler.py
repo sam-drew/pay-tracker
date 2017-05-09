@@ -121,3 +121,15 @@ def getShiftUserID(shiftID):
         return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
+
+def getShiftInfo(shiftID):
+    connection = makeConnection()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT startTime, endTime, pay, break_length FROM shifts WHERE ID = {0}")
+            cursor.execute(sql.format(shiftID))
+            return(cursor.fetchone())
+    except Exception as e:
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
+    finally:
+        connection.close()
