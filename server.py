@@ -136,7 +136,8 @@ class HomeHandler(tornado.web.RequestHandler):
                 {
                 "startDate" : shift['startTime'].strftime("%m/%d/%Y"),
                 "startTime" : shift['startTime'].strftime("%H:%M"),
-                "endTime" : shift['endTime'].strftime("%H:%M")
+                "endTime" : shift['endTime'].strftime("%H:%M"),
+                "ID" : shift['ID']
                 }
                 )
             self.render("home.html", shifts = formatedShifts)
@@ -173,6 +174,44 @@ class NewShiftHandler(tornado.web.RequestHandler):
         else:
             self.redirect("/home")
 
+class EditShiftHandler(tornado.web.RequestHandler):
+    def get(self, url):
+        # Validate user exists.
+        email = self.get_secure_cookie("email").decode("utf-8")
+        userID = dbhandler.getUserID(email)
+        if userID != None:
+            userID = userID['ID']
+        else:
+            self.redirect("/home")
+        # Validate that the shift being edited belongs to that user.
+        shiftID = url.rsplit("/", 1)
+        shiftID = (shiftID[(len(shiftID) - 1)])
+        shiftUserID = dbhandler.getShiftUserID(shiftID)
+        if shiftUserID != None:
+            shiftUserID = shiftUserID['userID']
+        else:
+            self.redirect("/home")
+        # Get shift info to be rendered to document.
+        shift = dbhandler.getShiftInfo(shiftID)
+        shiftInfo = {
+        'date' : shift['startTime'].strftime("%d/%m/%Y"),
+        'startTime' : shift['startTime'].strftime("%H:%M"),
+        'endTime' : shift['endTime'].strftime("%H:%M"),
+        'breakLength' : shift['break_length'],
+        'pay' : calculatePay(shift['startTime'], shift['endTime'], shift['break_length'], shift['pay'])
+        }
+        if shiftUserID == userID:
+            self.render("editShift.html", info = shiftInfo)
+        else:
+            self.redirect("/home")
+
+    def post(self, url):
+        email = self.get_secure_cookie("email").decode("utf-8")
+        userID = dbhandler.getUserID(email)
+        shiftID = url.rsplit("/", 1)
+        shiftID = (shiftID[(len(shiftID) - 1)])
+        self.redirect("/editShift/{0}".format(shiftID))
+
 # Function to decode and hash a given plaintext password and a salt.
 def hashPwd(pwd, salt):
     pwd = bytes(pwd, "ascii")
@@ -180,11 +219,18 @@ def hashPwd(pwd, salt):
     hashed = bcrypt.hashpw(pwd, salt)
     return(hashed)
 
+# Function to calculate the amount a shift pays based on wage, length, and break length.
+def calculatePay(startTime, endTime, breakLength, wage):
+    timeDelta = endTime - startTime
+    tdDecimal = (timeDelta.seconds / 3600)
+    tdDecimal = tdDecimal - float(breakLength)
+    return(tdDecimal * float(wage))
+
 enable_pretty_logging()
 app = tornado.web.Application(
     [(r"/", RootHandler),(r"/signup", SignUpHandler), (r"/calculate", CalculateHandler),
     (r"/login", LoginHandler), (r"/home", HomeHandler), (r"/newShift", NewShiftHandler),
-    (r"/logout", LogoutHandler),],
+    (r"/logout", LogoutHandler), (r"/editShift/(.*)", EditShiftHandler),],
     template_path = os.path.join(os.path.dirname(__file__), "templates"),
     static_path = os.path.join(os.path.dirname(__file__), "static"),
     cookie_secret = "secret",
