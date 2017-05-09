@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <title>Edit Shift</title>
+    <link rel="stylesheet" href="{{ static_url("style.css") }}">
+</head>
+<body>
+    <div id="singleShiftForm">
+        <h3>Shift Info</h3>
+        <table>
+            <tr>
+                <td><i>Date</i></td>
+                <td>{{ info['date'] }}</td>
+            </tr>
+            <tr>
+                <td><i>Start Time</i></td>
+                <td>{{ info['startTime'] }}</td>
+            </tr>
+            <tr>
+                <td><i>End Time</i></td>
+                <td>{{ info['endTime'] }}</td>
+            </tr>
+            <tr>
+                <td><i>Break Length</i></td>
+                <td>{{ info['breakLength'] }}</td>
+            </tr>
+            <tr>
+                <td><i>Total Pay</i></td>
+                <td>£{{ info['pay'] }}</td>
+            </tr>
+        </table>
+    </div>
+    <div id="singleShiftForm">
+        <h3>Edit Shift</h3>
+        <form action="" method="post">
+            <div>
+                Hourly wage
+            </div>
+            <div>
+                <input type="number" name="hourlyWage" step="0.001">
+            </div>
+            </br>
+            <div>
+                Shift START date and time
+            </div>
+            <div>
+                <input type="date" name="shiftStartDate">
+                <input type="time" name="shiftStartTime">
+            </div>
+            </br>
+            <div>
+                Shift END date and time
+            </div>
+            <div>
+                <input type="date" name="shiftEndDate">
+                <input type="time" name="shiftEndTime">
+            </div>
+            </br>
+            <div>
+                Break length
+                <select name="breakLength">
+                    <option value="0.25">15</option>
+                    <option value="0.50">30</option>
+                    <option value="0.75">45</option>
+                    <option value="1.00">60</option>
+                </select>
+            </div>
+            </br>
+            <input type="submit" value="Save">
+        </form>
+    </div>
+</body>
+</html>
