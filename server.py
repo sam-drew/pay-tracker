@@ -273,10 +273,11 @@ class PayDayHandler(tornado.web.RequestHandler):
         email = self.get_secure_cookie("email").decode("utf-8")
         userID = dbhandler.getUserID(email)['ID']
         shifts = dbhandler.getShifts(userID)
+        payDate = ((dbhandler.getShiftInfo((url.rsplit("/", 1))[(len(url.rsplit("/", 1)) - 1)]))['startTime']).strftime("%d/%m/%Y")
         shiftInfo = []
         payInfo = {
-        'date' : "TEST 04/04/2017",
-        'pay' : 500
+        'date' : payDate,
+        'pay' : calculatePayDay(shifts)
         }
         for shift in shifts:
             shiftInfo.append(
@@ -302,6 +303,12 @@ def calculatePay(startTime, endTime, breakLength, wage):
     tdDecimal = (timeDelta.seconds / 3600)
     tdDecimal = tdDecimal - float(breakLength)
     return(tdDecimal * float(wage))
+
+def calculatePayDay(shifts):
+    total = 0.0
+    for shift in shifts:
+        total = total + calculatePay(shift['startTime'], shift['endTime'], shift['break_length'], shift['pay'])
+    return(total)
 
 enable_pretty_logging()
 app = tornado.web.Application(

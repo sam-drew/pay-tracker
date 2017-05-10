@@ -87,7 +87,7 @@ def getShifts(userID):
     connection = makeConnection()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT ID, startTime, endTime FROM shifts WHERE userID = '{0}' AND pdflag = 0 ORDER BY startTime DESC")
+            sql = ("SELECT ID, startTime, endTime, break_length, pay FROM shifts WHERE userID = '{0}' AND pdflag = 0 ORDER BY startTime DESC")
             cursor.execute(sql.format(userID))
             shifts = cursor.fetchall()
             return(shifts)
