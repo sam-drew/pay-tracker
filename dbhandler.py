@@ -87,7 +87,7 @@ def getShifts(userID):
     connection = makeConnection()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT ID, startTime, endTime FROM shifts WHERE userID = '{0}' ORDER BY startTime DESC")
+            sql = ("SELECT ID, startTime, endTime FROM shifts WHERE userID = '{0}' AND pdflag = 0 ORDER BY startTime DESC")
             cursor.execute(sql.format(userID))
             shifts = cursor.fetchall()
             return(shifts)
@@ -96,6 +96,19 @@ def getShifts(userID):
     finally:
         connection.close()
 
+def getShiftsAndPaydays(userID):
+    connection = makeConnection()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT ID, startTime, endTime, pdflag FROM shifts WHERE userID = {0} ORDER BY startTime DESC")
+            cursor.execute(sql.format(userID))
+            shifts = cursor.fetchall()
+            return(shifts)
+    except Exception as e:
+        return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
+    finally:
+        connection.close()
+        
 def getUserID(email):
     connection = makeConnection()
     try:
