@@ -100,7 +100,7 @@ def getShiftsAndPaydays(userID):
     connection = makeConnection()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT ID, startTime, endTime, pdflag FROM shifts WHERE userID = {0} ORDER BY startTime DESC")
+            sql = ("SELECT ID, startTime, endTime, pdflag FROM shifts WHERE (userID = {0} OR pdflag = 1) ORDER BY startTime DESC")
             cursor.execute(sql.format(userID))
             shifts = cursor.fetchall()
             return(shifts)
@@ -108,7 +108,7 @@ def getShiftsAndPaydays(userID):
         return("Error: {0}. Error code is {1}".format(e.args[1], e.args[0]))
     finally:
         connection.close()
-        
+
 def getUserID(email):
     connection = makeConnection()
     try:

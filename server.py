@@ -60,7 +60,7 @@ class SignUpHandler(tornado.web.RequestHandler):
             info.append(self.get_argument(argument))
         logging.info("Attempt to add new user: {0}".format(info))
         alerts = []
-        if info[0] != info[2]:
+        if info[0] != info[1]:
             alerts.append("Emails do not match")
             if info[2] != info[3]:
                 alerts.append("Passwords do not match")
@@ -134,17 +134,34 @@ class HomeHandler(tornado.web.RequestHandler):
         else:
             email = self.get_secure_cookie("email").decode("utf-8")
             userID = dbhandler.getUserID(email)['ID']
-            shifts = dbhandler.getShifts(userID)
+            shifts = dbhandler.getShiftsAndPaydays(userID)
             formatedShifts = []
             for shift in shifts:
-                formatedShifts.append(
-                {
-                "startDate" : shift['startTime'].strftime("%d/%m/%Y"),
-                "startTime" : shift['startTime'].strftime("%H:%M"),
-                "endTime" : shift['endTime'].strftime("%H:%M"),
-                "ID" : shift['ID']
-                }
-                )
+                if shift['pdflag'] == 1:
+                    # Code for if shift is a payday
+                    formatedShifts.append(
+                    {
+                    "ID" : shift['ID'],
+                    "startDate" : shift['startTime'].strftime("%d/%m/%Y"),
+                    "pdflag" : True
+                    }
+                    )
+                    pass
+                elif shift['pdflag'] == 0:
+                    # Code for if shift is a regular shift
+                    formatedShifts.append(
+                    {
+                    "startDate" : shift['startTime'].strftime("%d/%m/%Y"),
+                    "startTime" : shift['startTime'].strftime("%H:%M"),
+                    "endTime" : shift['endTime'].strftime("%H:%M"),
+                    "ID" : shift['ID'],
+                    "pdflag" : False
+                    }
+                    )
+                else:
+                    # DATABASE ERROR
+                    logging.error("Big error with getting shifts: {0}".format(shifts))
+                    break
             self.render("home.html", shifts = formatedShifts)
 
 # Class to define how requests to the "/newShift" URL are handled. Includes
@@ -204,7 +221,7 @@ class EditShiftHandler(tornado.web.RequestHandler):
         'date' : shift['startTime'].strftime("%d/%m/%Y"),
         'startTime' : shift['startTime'].strftime("%H:%M"),
         'endTime' : shift['endTime'].strftime("%H:%M"),
-        'breakLength' : shift['break_length'],
+        'breakLength' : (shift['break_length'] * 60),
         'pay' : calculatePay(shift['startTime'], shift['endTime'], shift['break_length'], shift['pay'])
         }
         if shiftUserID == userID:
