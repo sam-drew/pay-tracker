@@ -13,7 +13,11 @@
         <p><a href="/newShift">Add a new shift.</a></p>
         <p>
             {% for shift in shifts %}
-            <div><a href="/editShift/{{ shift['ID'] }}">{{ shift['startDate'] }}    {{ shift['startTime'] }}    {{ shift['endTime'] }}</a></div>
+                {% if shift['pdflag'] == False %}
+                    <div><a href="/editShift/{{ shift['ID'] }}">{{ shift['startDate'] }}    {{ shift['startTime'] }}    {{ shift['endTime'] }}</a></div>
+                {% elif shift['pdflag'] == True %}
+                    <div class="payday"><a href="/payday/{{ shift['ID'] }}">PAYDAY     {{ shift['startDate'] }}</a></div>
+                {% end %}
             {% end %}
         </p>
         <p><a href="/logout">Logout</a></p>
