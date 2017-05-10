@@ -91,6 +91,11 @@ a {
     padding-top: 30px;
 }
 
+#shiftInfo {
+    max-width: 330px;
+    margin: 0 auto;
+}
+
 #homePage {
     max-width: 473px;
     margin: 0 auto;
@@ -101,6 +106,17 @@ a {
     max-width: 473px;
     margin: 0 auto;
     padding-top: 30px;
+}
+
+#paydayInfo {
+    max-width: 330px;
+    margin: 0 auto;
+    padding-top: 15px;
+}
+
+#payDayShifts {
+    max-width: 330px;
+    margin: 0 auto;
 }
 
 td {

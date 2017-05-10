@@ -139,7 +139,7 @@ class HomeHandler(tornado.web.RequestHandler):
             for shift in shifts:
                 formatedShifts.append(
                 {
-                "startDate" : shift['startTime'].strftime("%m/%d/%Y"),
+                "startDate" : shift['startTime'].strftime("%d/%m/%Y"),
                 "startTime" : shift['startTime'].strftime("%H:%M"),
                 "endTime" : shift['endTime'].strftime("%H:%M"),
                 "ID" : shift['ID']
@@ -264,7 +264,7 @@ class PayDayHandler(tornado.web.RequestHandler):
         for shift in shifts:
             shiftInfo.append(
             {
-            "startDate" : shift['startTime'].strftime("%m/%d/%Y"),
+            "startDate" : shift['startTime'].strftime("%d/%m/%Y"),
             "startTime" : shift['startTime'].strftime("%H:%M"),
             "endTime" : shift['endTime'].strftime("%H:%M"),
             "ID" : shift['ID']
