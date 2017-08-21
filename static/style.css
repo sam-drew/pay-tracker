@@ -88,7 +88,7 @@ a {
 #singleShiftForm {
     max-width: 330px;
     margin: 0 auto;
-    padding-top: 30px;
+    padding-top: 15px;
 }
 
 #shiftInfo {
@@ -99,13 +99,12 @@ a {
 #homePage {
     max-width: 473px;
     margin: 0 auto;
-    padding-top: 30px;
 }
 
 #newShiftPage {
     max-width: 473px;
     margin: 0 auto;
-    padding-top: 30px;
+    padding-top: 15px;
 }
 
 #paydayInfo {
@@ -117,6 +116,10 @@ a {
 #payDayShifts {
     max-width: 330px;
     margin: 0 auto;
+}
+
+#description {
+    text-align: center;
 }
 
 td {
