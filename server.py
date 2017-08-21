@@ -5,7 +5,7 @@ from tornado.log import enable_pretty_logging
 
 import logging
 import os.path
-from datetime import datetime
+import datetime
 import bcrypt
 
 import dbhandler
@@ -35,8 +35,8 @@ class CalculateHandler(tornado.web.RequestHandler):
         shiftEndTime = str(self.get_argument("shiftEndTime"))
         endDateTime = shiftEndDate + " " + shiftEndTime
         try:
-            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
-            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
+            startDateTime = datetime.datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
+            endDateTime = datetime.datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
         except:
             self.redirect("/calculate")
 
@@ -134,7 +134,8 @@ class HomeHandler(tornado.web.RequestHandler):
         else:
             email = self.get_secure_cookie("email").decode("utf-8")
             userID = dbhandler.getUserID(email)['ID']
-            shifts = dbhandler.getShiftsAndPaydays(userID)
+            maxDate = datetime.datetime.now() + datetime.timedelta(seconds = 2419200)
+            shifts = dbhandler.getShiftsAndPaydays(userID, maxDate)
             formatedShifts = []
             for shift in shifts:
                 if shift['pdflag'] == 1:
@@ -182,8 +183,8 @@ class NewShiftHandler(tornado.web.RequestHandler):
         shiftEndTime = str(self.get_argument("shiftEndTime"))
         endDateTime = shiftEndDate + " " + shiftEndTime
         try:
-            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
-            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
+            startDateTime = datetime.datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
+            endDateTime = datetime.datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
         except:
             self.redirect("/newShift")
         breakLength = float(self.get_argument("breakLength"))
@@ -253,8 +254,8 @@ class EditShiftHandler(tornado.web.RequestHandler):
         shiftEndTime = str(self.get_argument("shiftEndTime"))
         endDateTime = shiftEndDate + " " + shiftEndTime
         try:
-            startDateTime = datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
-            endDateTime = datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
+            startDateTime = datetime.datetime.strptime(startDateTime, '%Y-%m-%d %H:%M')
+            endDateTime = datetime.datetime.strptime(endDateTime, '%Y-%m-%d %H:%M')
         except:
             self.redirect("/newShift")
         breakLength = float(self.get_argument("breakLength"))
@@ -272,8 +273,12 @@ class PayDayHandler(tornado.web.RequestHandler):
     def get(self, url):
         email = self.get_secure_cookie("email").decode("utf-8")
         userID = dbhandler.getUserID(email)['ID']
-        shifts = dbhandler.getShifts(userID)
-        payDate = ((dbhandler.getShiftInfo((url.rsplit("/", 1))[(len(url.rsplit("/", 1)) - 1)]))['startTime']).strftime("%d/%m/%Y")
+        # Get the ID of the payday from the url and then get the date from the
+        # startTime database entry.
+        payDateTime = ((dbhandler.getShiftInfo((url.rsplit("/", 1))[(len(url.rsplit("/", 1)) - 1)]))['startTime'])
+        payDate = payDateTime.strftime("%d/%m/%Y")
+        prevPayDateTime = payDateTime - datetime.timedelta(days=28)
+        shifts = dbhandler.getShifts(userID, payDateTime, prevPayDateTime)
         shiftInfo = []
         payInfo = {
         'date' : payDate,

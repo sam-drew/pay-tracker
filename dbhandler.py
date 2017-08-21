@@ -83,12 +83,12 @@ def addNewShift(startDateTime, endDateTime, breakLength, pay, userID):
     finally:
         connection.close()
 
-def getShifts(userID):
+def getShifts(userID, maxDate, minDate):
     connection = makeConnection()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT ID, startTime, endTime, break_length, pay FROM shifts WHERE userID = '{0}' AND pdflag = 0 ORDER BY startTime DESC")
-            cursor.execute(sql.format(userID))
+            sql = ("SELECT ID, startTime, endTime, break_length, pay FROM shifts WHERE userID = '{0}' AND pdflag = 0 AND startTime < '{1}' AND startTime > '{2}' ORDER BY startTime DESC")
+            cursor.execute(sql.format(userID, maxDate, minDate))
             shifts = cursor.fetchall()
             return(shifts)
     except Exception as e:
@@ -96,12 +96,12 @@ def getShifts(userID):
     finally:
         connection.close()
 
-def getShiftsAndPaydays(userID):
+def getShiftsAndPaydays(userID, maxDate):
     connection = makeConnection()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT ID, startTime, endTime, pdflag FROM shifts WHERE (userID = {0} OR pdflag = 1) ORDER BY startTime DESC")
-            cursor.execute(sql.format(userID))
+            sql = ("SELECT ID, startTime, endTime, pdflag FROM shifts WHERE (userID = {0} OR pdflag = 1) AND startTime < '{1}' ORDER BY startTime DESC LIMIT 25")
+            cursor.execute(sql.format(userID, maxDate))
             shifts = cursor.fetchall()
             return(shifts)
     except Exception as e:
